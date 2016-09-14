@@ -1,0 +1,16 @@
+.DS_Store
+Thumbs.db
+src/main/dist
+node_modules
+npm-debug.log
+bower_components
+fis_components
+*/src/main/webapp/static/CONFIG.js
+logs
+target
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+/RUNNING_PID
