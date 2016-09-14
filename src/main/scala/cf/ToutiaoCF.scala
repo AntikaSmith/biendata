@@ -54,7 +54,7 @@ object ToutiaoCF {
     val prediction = x(3).asInstanceOf[Float]
     if (prediction.isNaN){
       println(s"unkown num:$x")
-      Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], 1)
+      Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], 0)
     }
     else Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], math.min(x(3).asInstanceOf[Float], 1))
   }
@@ -69,7 +69,7 @@ object ToutiaoCF {
     val Array(training, test) = ratings.randomSplit(Array(0.8, 0.2))
 
     val als = new ALS()
-      .setMaxIter(10)
+      .setMaxIter(5)
       .setRegParam(0.01)
       .setRank(200)
       .setUserCol("userId")
