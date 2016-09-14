@@ -9,6 +9,7 @@ import java.io.{BufferedReader, InputStreamReader}
 import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.recommendation.ALS
 import org.apache.spark.sql.{Row, SparkSession}
+import util.ParseUtil
 
 object ToutiaoCF {
 
@@ -60,7 +61,7 @@ object ToutiaoCF {
   }
 
   def main(args: Array[String]) = {
-    val spark = SparkSession.builder().appName("toutiaocf").config("spark.sql.warehouse.dir", "file:///C/workspace/biendata/warehouse").getOrCreate()
+    val spark = ParseUtil.spark
 
     import spark.implicits._
 
