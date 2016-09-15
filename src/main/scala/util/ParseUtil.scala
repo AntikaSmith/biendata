@@ -69,6 +69,20 @@ object ParseUtil {
   lazy val userMap = userLines.map(x => x.split("\t").head -> x.split("\t")).toMap
   lazy val questionMap = questionLines.map(x => x.split("\t").head -> x.split("\t")).toMap
 
+  def computeMeanSigma(arr: Array[Int]) = {
+    val sum = arr.sum
+    val mean = sum.toDouble / arr.size
+    val sigma = arr.map(_ - mean).map(math.pow(_,2)).sum / arr.size
+    (mean, math.sqrt(sigma))
+  }
+
+  def normalize(arr: Array[Int]) = {
+    val (agreeMean, agreeSigma) = (972.1509573810995,  5016.309790789912)
+    val (answerMean, answerSigma) =  (40.78060531192094,190.6041421861907)
+    val (boutiqueMean, boutiqueSigma) = (9.621371216800494,29.48870975159823)
+    Array(arr(0) - agreeMean/ agreeSigma, arr(1) - answerMean / answerSigma, arr(2) - boutiqueMean/ boutiqueSigma)
+  }
+
   def convertInput(path:String) = {
     val outputName = path.split("\\.").head + "outpu" +  ".txt"
     val file = new PrintWriter(outputName)
@@ -77,7 +91,7 @@ object ParseUtil {
       if (qid.size == 32){
         file.println(List(questionMap(qid)(1),
           questionVecMap(qid).toArray.map(_.toFloat).mkString(","),
-          questionMap(qid).takeRight(3).mkString(","),
+          normalize(questionMap(qid).takeRight(3).map(_.toInt)).mkString(","),
           userTagVec(uid).toArray.map(_.toFloat).mkString(","),
           userVecMap(uid).toArray.map(_.toFloat).mkString(",")
         ).mkString(",") + "\t" + label
