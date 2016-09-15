@@ -45,7 +45,10 @@ object ParseUtil {
     model.transform(df)
   }
 
-  val questionDesc = doc2vec(readFile("question_info.txt").toSeq.map(_.split('\t')).map { question =>
+  def getWordVecs(path: String) = doc2vec(readFile(path).toSeq.map(_.split('\t')).map { question =>
     Row(question(0), question(2).split("/"))
   }, StructType(Seq(StructField("id", StringType),StructField("text", ArrayType(StringType, true)))))
+
+  lazy val questionDesc = getWordVecs("question_info.txt")
+  lazy val userDesc = getWordVecs("user_info.txt")
 }
