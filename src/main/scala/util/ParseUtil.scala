@@ -84,7 +84,7 @@ object ParseUtil {
   }
 
   def convertInput(path:String) = {
-    val outputName = path.split("\\.").head + "outpu" +  ".txt"
+    val outputName = path.split("\\.").head + "output" +  ".txt"
     val file = new PrintWriter(outputName)
     for (line <- readFile(path)){
       val Array(qid, uid, label) = line.split("\t")
