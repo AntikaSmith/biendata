@@ -7,7 +7,7 @@ import util.ParseUtil
 class UtilTest extends FlatSpec with BeforeAndAfterAll with Matchers{
   "doc2vec" should  "be ok" in {
     import ParseUtil.spark.implicits._
-    ParseUtil.questionDesc.show()
+    println(ParseUtil.questionVecMap.last)
 
   }
 }

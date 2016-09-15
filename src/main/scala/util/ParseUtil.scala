@@ -5,7 +5,7 @@ package util
   */
 
 import org.apache.spark.ml.feature.Word2Vec
-import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.catalyst.ScalaReflection.Schema
 import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
 
@@ -28,8 +28,8 @@ object ParseUtil {
 
   def extractMap(file: String) = readFile(file).map(_.split("\t").apply(0)).zipWithIndex.toMap
 
-  val questionIdMap = extractMap("question_info.txt")
-  val userIdMap = extractMap("user_info.txt")
+  lazy val questionIdMap = extractMap("question_info.txt")
+  lazy val userIdMap = extractMap("user_info.txt")
 
   def doc2vec(docs: Seq[Row], tpe: StructType) = {
     import spark.implicits._
@@ -45,10 +45,21 @@ object ParseUtil {
     model.transform(df)
   }
 
-  def getWordVecs(path: String) = doc2vec(readFile(path).toSeq.map(_.split('\t')).map { question =>
-    Row(question(0), question(2).split("/"))
+  def getWordVecs(path: String, wordsIndex: Int) = doc2vec(readFile(path).toSeq.map(_.split('\t')).map { question =>
+    Row(question(0), question(wordsIndex).split("/"))
   }, StructType(Seq(StructField("id", StringType),StructField("text", ArrayType(StringType, true)))))
 
-  lazy val questionDesc = getWordVecs("question_info.txt")
-  lazy val userDesc = getWordVecs("user_info.txt")
+  lazy val questionDesc = getWordVecs("question_info.txt", 2)
+  lazy val userDesc = getWordVecs("user_info.txt", 2)
+  lazy val userTag = getWordVecs("user_info.txt", 1)
+
+  def df2map(df: DataFrame) = df.collect().map(x =>
+    x.get(0).asInstanceOf[String] -> x.get(2)
+  ).toMap
+
+  val questionVecMap = df2map(questionDesc)
+
+  val userVecMap = df2map(userDesc)
+
+  val userTagVec = df2map(userTag)
 }
