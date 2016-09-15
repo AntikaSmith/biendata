@@ -14,3 +14,5 @@ target
 /.project
 /.settings
 /RUNNING_PID
+invited_info_trainoutpu.txt
+validate_nolabeloutpu.txt

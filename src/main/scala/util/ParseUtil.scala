@@ -4,7 +4,10 @@ package util
   * Created by ZhangHan on 2016/9/14.
   */
 
+import java.io.PrintWriter
+
 import org.apache.spark.ml.feature.Word2Vec
+import org.apache.spark.ml.linalg.{DenseVector, Vector => SparkVector}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.catalyst.ScalaReflection.Schema
 import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
@@ -22,9 +25,9 @@ object ParseUtil {
     scala.io.Source.fromInputStream(stream).getLines()
   }
 
-  def userLines = readFile("user_info.txt")
+  def userLines = readFile("user_info.txt").toList
 
-  def questionLines = readFile("question_info.txt")
+  def questionLines = readFile("question_info.txt").toList
 
   def extractMap(file: String) = readFile(file).map(_.split("\t").apply(0)).zipWithIndex.toMap
 
@@ -54,16 +57,34 @@ object ParseUtil {
   lazy val userTag = getWordVecs("user_info.txt", 1, 10)
 
   def df2map(df: DataFrame) = df.collect().map(x =>
-    x.get(0).asInstanceOf[String] -> x.get(2)
+    x.get(0).asInstanceOf[String] -> x.get(2).asInstanceOf[SparkVector]
   ).toMap
 
-  val questionVecMap = df2map(questionDesc)
+  lazy val questionVecMap = df2map(questionDesc)
 
-  val userVecMap = df2map(userDesc)
+  lazy val userVecMap = df2map(userDesc)
 
-  val userTagVec = df2map(userTag)
+  lazy val userTagVec = df2map(userTag)
+
+  lazy val userMap = userLines.map(x => x.split("\t").head -> x.split("\t")).toMap
+  lazy val questionMap = questionLines.map(x => x.split("\t").head -> x.split("\t")).toMap
 
   def convertInput(path:String) = {
-    
+    val outputName = path.split("\\.").head + "outpu" +  ".txt"
+    val file = new PrintWriter(outputName)
+    for (line <- readFile(path)){
+      val Array(qid, uid, label) = line.split("\t")
+      if (qid.size == 32){
+        file.println(List(questionMap(qid)(1),
+          questionVecMap(qid).toArray.map(_.toFloat).mkString(","),
+          questionMap(qid).takeRight(3).mkString(","),
+          userTagVec(uid).toArray.map(_.toFloat).mkString(","),
+          userVecMap(uid).toArray.map(_.toFloat).mkString(",")
+        ).mkString(",") + "\t" + label
+        )
+      }
+    }
+    file.flush()
+    file.close()
   }
 }
