@@ -33,7 +33,7 @@ object ParseUtil {
     val word2vec = new Word2Vec()
       .setInputCol("text")
       .setOutputCol("result")
-      .setVectorSize(10)
+      .setVectorSize(100)
       .setMinCount(0)
 
     val model = word2vec.fit(df)
