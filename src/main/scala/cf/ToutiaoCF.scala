@@ -17,35 +17,11 @@ object ToutiaoCF {
   case class Rating(questionId: Int, userId: Int, answer : Float)
   case class Prediction(questionId: Int, userId: Int, answer : Float, prediction: Float)
 
-  def getStringFromFile(filePath: String) = {
-    val in = getClass.getClassLoader.getResourceAsStream(filePath)
-    val inReader = new InputStreamReader(in, "utf-8")
-    val bf = new BufferedReader(inReader)
-    val sb = new StringBuilder()
-    var line = ""
-    do {
-      line = bf.readLine()
-      if (line != null) {
-        if (sb.length != 0) {
-          sb.append("\n")
-        }
-        sb.append(line)
-      }
-    } while (line != null)
 
-    in.close()
-    inReader.close()
-    bf.close()
-
-    sb.toString()
-  }
-
-  def extractMap(file: String) = getStringFromFile(file).split("\n").map(_.split("\t").apply(0)).zipWithIndex.toMap
-
-  val questionIdMap = extractMap("question_info.txt")
-  val userIdMap = extractMap("user_info.txt")
 
   def pasreRating(str: String): Rating = {
+    import ParseUtil.{questionIdMap, userIdMap}
+
     val fields = str.split("\t")
     assert(fields.size == 3 && !fields(2).toFloat.isNaN)
     Rating(questionIdMap(fields(0)), userIdMap(fields(1)), fields(2).toFloat)

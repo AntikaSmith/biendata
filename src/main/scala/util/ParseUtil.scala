@@ -26,10 +26,15 @@ object ParseUtil {
 
   def questionLines = readFile("question_info.txt")
 
-  def doc2vec(docs: Seq[Array[String]]) = {
+  def extractMap(file: String) = readFile(file).map(_.split("\t").apply(0)).zipWithIndex.toMap
+
+  val questionIdMap = extractMap("question_info.txt")
+  val userIdMap = extractMap("user_info.txt")
+
+  def doc2vec(docs: Seq[_]) = {
     import spark.implicits._
     val docRdd = spark.sparkContext.parallelize(docs).map(x => Row(x))
-    val df = spark.createDataFrame(docRdd, StructType(Seq(StructField("_1", ArrayType(StringType, true))))).toDF("text")
+    val df = spark.createDataFrame(docRdd, StructType(Seq(StructField("text", ArrayType(StringType, true)))))
     val word2vec = new Word2Vec()
       .setInputCol("text")
       .setOutputCol("result")
