@@ -16,3 +16,4 @@ target
 /RUNNING_PID
 invited_info_trainoutput.txt
 validate_nolabeloutput.txt
+y_train.txt
