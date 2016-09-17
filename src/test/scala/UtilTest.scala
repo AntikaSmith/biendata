@@ -10,11 +10,12 @@ class UtilTest extends FlatSpec with BeforeAndAfterAll with Matchers{
     println(ParseUtil.userTagVec.last)
   }
 
-  "convert train" should "be ok" in {
+  "convert train and validate" should "be ok" in {
     ParseUtil.convertInput("invited_info_train.txt")
+    ParseUtil.convertInput("validate_nolabel.txt")
   }
 
   "convert validate" should "be ok" in {
-    ParseUtil.convertInput("validate_nolabel.txt")
+
   }
 }

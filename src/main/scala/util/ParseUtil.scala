@@ -76,26 +76,30 @@ object ParseUtil {
     (mean, math.sqrt(sigma))
   }
 
-  def normalize(arr: Array[Int]) = {
-    val (agreeMean, agreeSigma) = (972.1509573810995,  5016.309790789912)
-    val (answerMean, answerSigma) =  (40.78060531192094,190.6041421861907)
-    val (boutiqueMean, boutiqueSigma) = (9.621371216800494,29.48870975159823)
+  def normalize(arr: Array[Double]) = {
+    val (agreeMean, agreeSigma) = (4.589098867948532,2.269819260942984)
+    val (answerMean, answerSigma) =   (2.366524658948996,1.3284576324183783)
+    val (boutiqueMean, boutiqueSigma) = (1.7271286096158458,0.972602339995984)
     Array(arr(0) - agreeMean/ agreeSigma, arr(1) - answerMean / answerSigma, arr(2) - boutiqueMean/ boutiqueSigma)
   }
 
   def convertInput(path:String) = {
     val outputName = path.split("\\.").head + "output" +  ".txt"
     val file = new PrintWriter(outputName)
+    val questionClass = Range(0, 20).map(_ * 0).toArray
     for (line <- readFile(path)){
       val Array(qid, uid, label) = line.split("\t")
       if (qid.size == 32){
-        file.println(List(questionMap(qid)(1),
+        val qclassId = questionMap(qid)(1).toInt
+        questionClass(qclassId) = 1
+        file.println(List(questionClass.mkString(","),
           questionVecMap(qid).toArray.map(_.toFloat).mkString(","),
-          normalize(questionMap(qid).takeRight(3).map(_.toInt)).mkString(","),
+          normalize(questionMap(qid).takeRight(3).map(s => math.log(s.toDouble + 1))).mkString(","),
           userTagVec(uid).toArray.map(_.toFloat).mkString(","),
           userVecMap(uid).toArray.map(_.toFloat).mkString(",")
-        ).mkString(",") + "\t" + label
+        ).mkString(",") + "," + label
         )
+      questionClass(qclassId) = 0
       }
     }
     file.flush()
