@@ -86,7 +86,7 @@ object ParseUtil {
   def convertInput(path:String) = {
     val outputName = path.split("\\.").head + "output" +  ".txt"
     val file = new PrintWriter(outputName)
-    val questionClass = Range(0, 20).map(_ * 0).toArray
+    val questionClass = Array.fill(20)(0)
     for (line <- readFile(path)){
       val Array(qid, uid, label) = line.split("\t")
       if (qid.size == 32){
