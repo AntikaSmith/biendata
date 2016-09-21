@@ -48,7 +48,7 @@ object ParseUtil {
     model.transform(df)
   }
 
-  def getWordVecs(path: String, wordsIndex: Int, vectorSize:Int = 100) = doc2vec(readFile(path).toSeq.map(_.split('\t')).map { question =>
+  def getWordVecs(path: String, wordsIndex: Int, vectorSize:Int = 50) = doc2vec(readFile(path).toSeq.map(_.split('\t')).map { question =>
     Row(question(0), question(wordsIndex).split("/"))
   }, StructType(Seq(StructField("id", StringType),StructField("text", ArrayType(StringType, true)))), vectorSize)
 
