@@ -18,4 +18,5 @@ data
 invited_info_trainoutput.txt
 validate_nolabeloutput.txt
 y_train.txt
+final.csv
 *output.txt

@@ -4,7 +4,7 @@ package cf
   * Created by ZhangHan on 2016/9/14.
   */
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{BufferedReader, File, InputStreamReader, PrintWriter}
 
 import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.recommendation.ALS
@@ -70,12 +70,24 @@ object ToutiaoCF {
       .write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite)
       .option("header", "true")
       .save("data")
-    val evaluator = new RegressionEvaluator()
-      .setMetricName("rmse")
-      .setLabelCol("answer")
-      .setPredictionCol("prediction")
-    val rmse = evaluator.evaluate(predictions)
-    println(s"Root-mean-square error = $rmse")
+    val nn_output = scala.io.Source.fromFile("nn_output.txt").mkString.split("\n").map(_.toFloat)
+    val cf_output = scala.io.Source.fromFile("data/final.csv").mkString.split("\n").map(_.split(",")).zip(nn_output).map{
+      case (arr, nn) if arr(0) != "qid"=>
+        Array(arr(0), arr(1), (arr(2).toFloat * 0.8 + nn * 0.2).toFloat).mkString(",")
+      case x =>
+        x._1.mkString(",")
+    }.mkString("", "\n", "\n")
+
+    val finalFile = new File("final.csv")
+    val writer = new PrintWriter(finalFile)
+    writer.write(cf_output)
+    writer.close()
+//    val evaluator = new RegressionEvaluator()
+//      .setMetricName("rmse")
+//      .setLabelCol("answer")
+//      .setPredictionCol("prediction")
+//    val rmse = evaluator.evaluate(predictions)
+//    println(s"Root-mean-square error = $rmse")
     // $example off$
 
     spark.stop()
