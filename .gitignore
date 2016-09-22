@@ -17,3 +17,4 @@ target
 invited_info_trainoutput.txt
 validate_nolabeloutput.txt
 y_train.txt
+*output.txt

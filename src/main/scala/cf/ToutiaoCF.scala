@@ -8,7 +8,7 @@ import java.io.{BufferedReader, InputStreamReader}
 
 import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.recommendation.ALS
-import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.{Dataset, Row, SaveMode, SparkSession}
 import util.ParseUtil
 
 object ToutiaoCF {
@@ -23,14 +23,15 @@ object ToutiaoCF {
     import ParseUtil.{questionIdMap, userIdMap}
 
     val fields = str.split("\t")
-    assert(fields.size == 3 && !fields(2).toFloat.isNaN)
+
+    assert(fields.size == 3 && fields(0) != "qid")
     Rating(questionIdMap(fields(0)), userIdMap(fields(1)), fields(2).toFloat)
   }
 
   def convertProb(x: Row) = {
     val prediction = x(3).asInstanceOf[Float]
     if (prediction.isNaN){
-      println(s"unkown num:$x")
+      //println(s"unkown num:$x")
       Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], 0)
     }
     else Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], math.min(x(3).asInstanceOf[Float], 1))
@@ -41,9 +42,11 @@ object ToutiaoCF {
 
     import spark.implicits._
 
-    val ratings = spark.read.textFile("src/main/resources/invited_info_train.txt").map(pasreRating(_)).toDF()
+    def constructData(fileName: String) = spark.read.textFile(fileName).map(pasreRating(_)).toDF()
 
-    val Array(training, test) = ratings.randomSplit(Array(0.8, 0.2))
+    val training = constructData("src/main/resources/invited_info_train.txt")
+
+    val validating = constructData("src/main/resources/validate_nolabel.txt")
 
     val als = new ALS()
       .setMaxIter(5)
@@ -56,8 +59,13 @@ object ToutiaoCF {
 
     val model = als.fit(training)
 
-    val predictions = model.transform(test).map(convertProb)
-    predictions.show()
+    val predictions: Dataset[Prediction] = model.transform(validating).map(convertProb)
+    predictions
+      // place all data in a single partition
+      .coalesce(1)
+      .write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite)
+      .option("header", "true")
+      .save("data")
     val evaluator = new RegressionEvaluator()
       .setMetricName("rmse")
       .setLabelCol("answer")
