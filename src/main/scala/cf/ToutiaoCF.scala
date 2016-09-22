@@ -16,25 +16,26 @@ object ToutiaoCF {
 
   case class Rating(questionId: Int, userId: Int, answer : Float)
   case class Prediction(questionId: Int, userId: Int, answer : Float, prediction: Float)
+  case class Result(qid: String, uid: String, label: Float)
 
 
 
   def pasreRating(str: String): Rating = {
-    import ParseUtil.{questionIdMap, userIdMap}
+    import ParseUtil.{qid2numberIdMap, uid2numberIdMap}
 
     val fields = str.split("\t")
 
     assert(fields.size == 3 && fields(0) != "qid")
-    Rating(questionIdMap(fields(0)), userIdMap(fields(1)), fields(2).toFloat)
+    Rating(qid2numberIdMap(fields(0)), uid2numberIdMap(fields(1)), fields(2).toFloat)
   }
 
   def convertProb(x: Row) = {
-//    val prediction = x(3).asInstanceOf[Float]
-//    if (prediction.isNaN){
-//      //println(s"unkown num:$x")
-//      Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], 0)
-//    }
-//    else
+    val prediction = x(3).asInstanceOf[Float]
+    if (prediction.isNaN){
+      //println(s"unkown num:$x")
+      Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], 0.01f)
+    }
+    else
       Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], math.min(x(3).asInstanceOf[Float], 1))
   }
 
@@ -60,7 +61,9 @@ object ToutiaoCF {
 
     val model = als.fit(training)
 
-    val predictions: Dataset[Prediction] = model.transform(validating).map(convertProb)
+    val predictions = model.transform(validating).map(convertProb).map(prediction =>
+      Result(ParseUtil.numberId2qidMap(prediction.questionId), ParseUtil.numberId2uidMap(prediction.userId), prediction.prediction)
+    )
     predictions
       // place all data in a single partition
       .coalesce(1)

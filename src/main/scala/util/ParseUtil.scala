@@ -31,8 +31,10 @@ object ParseUtil {
 
   def extractMap(file: String) = readFile(file).map(_.split("\t").apply(0)).zipWithIndex.toMap
 
-  lazy val questionIdMap = extractMap("question_info.txt")
-  lazy val userIdMap = extractMap("user_info.txt")
+  lazy val qid2numberIdMap = extractMap("question_info.txt")
+  lazy val uid2numberIdMap = extractMap("user_info.txt")
+  lazy val numberId2qidMap = qid2numberIdMap.toList.map(x => x._2 -> x._1).toMap
+  lazy val numberId2uidMap = uid2numberIdMap.toList.map(x => x._2 -> x._1).toMap
 
   def doc2vec(docs: Seq[Row], tpe: StructType, vectorSize:Int = 100) = {
     import spark.implicits._

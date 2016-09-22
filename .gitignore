@@ -8,6 +8,7 @@ fis_components
 */src/main/webapp/static/CONFIG.js
 logs
 target
+data
 /.idea
 /.idea_modules
 /.classpath
