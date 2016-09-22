@@ -29,12 +29,13 @@ object ToutiaoCF {
   }
 
   def convertProb(x: Row) = {
-    val prediction = x(3).asInstanceOf[Float]
-    if (prediction.isNaN){
-      //println(s"unkown num:$x")
-      Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], 0)
-    }
-    else Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], math.min(x(3).asInstanceOf[Float], 1))
+//    val prediction = x(3).asInstanceOf[Float]
+//    if (prediction.isNaN){
+//      //println(s"unkown num:$x")
+//      Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], 0)
+//    }
+//    else
+      Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], math.min(x(3).asInstanceOf[Float], 1))
   }
 
   def main(args: Array[String]) = {
