@@ -7,12 +7,9 @@ package util
 import java.io.PrintWriter
 
 import org.apache.spark.ml.feature.Word2Vec
-import org.apache.spark.ml.linalg.{DenseVector, Vector => SparkVector}
+import org.apache.spark.ml.linalg.{Vector => SparkVector}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.sql.catalyst.ScalaReflection.Schema
 import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
-
-import scala.reflect.runtime.universe.TypeTag
 
 object ParseUtil {
 

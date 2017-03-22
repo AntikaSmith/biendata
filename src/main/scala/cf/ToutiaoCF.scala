@@ -4,21 +4,17 @@ package cf
   * Created by ZhangHan on 2016/9/14.
   */
 
-import java.io.{BufferedReader, File, InputStreamReader, PrintWriter}
+import java.io.{File, PrintWriter}
 
-import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.recommendation.ALS
-import org.apache.spark.sql.{Dataset, Row, SaveMode, SparkSession}
+import org.apache.spark.sql.{Row, SaveMode}
 import util.ParseUtil
 
+case class Rating(questionId: Int, userId: Int, answer : Float)
+case class Prediction(questionId: Int, userId: Int, answer : Float, prediction: Float)
+case class Result(qid: String, uid: String, label: Float)
+
 object ToutiaoCF {
-
-
-  case class Rating(questionId: Int, userId: Int, answer : Float)
-  case class Prediction(questionId: Int, userId: Int, answer : Float, prediction: Float)
-  case class Result(qid: String, uid: String, label: Float)
-
-
 
   def pasreRating(str: String): Rating = {
     import ParseUtil.{qid2numberIdMap, uid2numberIdMap}
