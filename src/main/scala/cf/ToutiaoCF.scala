@@ -25,6 +25,7 @@ object ToutiaoCF {
     Rating(qid2numberIdMap(fields(0)), uid2numberIdMap(fields(1)), fields(2).toFloat)
   }
 
+  //set the default value of svd prediction as 0.01 instead of NaN
   def convertProb(x: Row) = {
     val prediction = x(3).asInstanceOf[Float]
     if (prediction.isNaN){
@@ -66,6 +67,8 @@ object ToutiaoCF {
       .write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite)
       .option("header", "true")
       .save("data")
+
+    //ensemble the output of neural network and svd
     val nn_output = scala.io.Source.fromFile("nn_output.txt").mkString.split("\n").map(_.toFloat)
     val cf_output = scala.io.Source.fromFile("data/final.csv").mkString.split("\n").map(_.split(",")).zip(nn_output).map{
       case (arr, nn) if arr(0) != "qid"=>
