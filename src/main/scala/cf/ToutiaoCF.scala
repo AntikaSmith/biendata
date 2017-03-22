@@ -71,7 +71,7 @@ object ToutiaoCF {
 
   def main(args: Array[String]) = {
 
-    //ensemble the output of neural network and svd
+    //ensemble the output of neural network and svd, need network output in place
     val nn_output = scala.io.Source.fromFile("nn_output.txt").mkString.split("\n").map(_.toFloat)
     val cf_output = scala.io.Source.fromFile("data/final.csv").mkString.split("\n").map(_.split(",")).zip(nn_output).map{
       case (arr, nn) if arr(0) != "qid"=>
