@@ -11,6 +11,9 @@ import org.apache.spark.ml.linalg.{Vector => SparkVector}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
 
+/**
+  * svd和神经网络数据处理的公用部分，convertInput的输出写入文件中作为神经网络的输入
+ */
 object ParseUtil {
 
   val spark = SparkSession.builder().appName("toutiaocf").config("spark.sql.warehouse.dir", "file:///C/workspace/biendata/warehouse").getOrCreate()

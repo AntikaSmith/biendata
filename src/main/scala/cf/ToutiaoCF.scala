@@ -36,7 +36,7 @@ object ToutiaoCF {
       Prediction(x(0).asInstanceOf[Int], x(1).asInstanceOf[Int], x(2).asInstanceOf[Float], math.min(x(3).asInstanceOf[Float], 1))
   }
 
-  def main(args: Array[String]) = {
+  def svd = {
     val spark = ParseUtil.spark
 
     import spark.implicits._
@@ -67,6 +67,9 @@ object ToutiaoCF {
       .write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite)
       .option("header", "true")
       .save("data")
+  }
+
+  def main(args: Array[String]) = {
 
     //ensemble the output of neural network and svd
     val nn_output = scala.io.Source.fromFile("nn_output.txt").mkString.split("\n").map(_.toFloat)
@@ -89,6 +92,6 @@ object ToutiaoCF {
 //    println(s"Root-mean-square error = $rmse")
     // $example off$
 
-    spark.stop()
+    ParseUtil.spark.stop()
   }
 }
