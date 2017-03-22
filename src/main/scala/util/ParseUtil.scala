@@ -22,11 +22,11 @@ object ParseUtil {
     scala.io.Source.fromInputStream(stream).getLines()
   }
 
-  def userLines = readFile("user_info.txt").toList
+  private[util] def userLines = readFile("user_info.txt").toList
 
-  def questionLines = readFile("question_info.txt").toList
+  private [util] def questionLines = readFile("question_info.txt").toList
 
-  def extractMap(file: String) = readFile(file).map(_.split("\t").apply(0)).zipWithIndex.toMap
+  private [util] def extractMap(file: String) = readFile(file).map(_.split("\t").apply(0)).zipWithIndex.toMap
 
   lazy val qid2numberIdMap = extractMap("question_info.txt")
   lazy val uid2numberIdMap = extractMap("user_info.txt")
@@ -59,13 +59,18 @@ object ParseUtil {
     x.get(0).asInstanceOf[String] -> x.get(2).asInstanceOf[SparkVector]
   ).toMap
 
+  //question words id to vector map
   lazy val questionVecMap = df2map(questionDesc)
 
+  //user info words id to vector map
   lazy val userVecMap = df2map(userDesc)
 
+  //user tag word id to vector map
   lazy val userTagVec = df2map(userTag)
 
+  //user id to user info lines
   lazy val userMap = userLines.map(x => x.split("\t").head -> x.split("\t")).toMap
+  //question id to question info lines
   lazy val questionMap = questionLines.map(x => x.split("\t").head -> x.split("\t")).toMap
 
   def computeMeanSigma(arr: Array[Int]) = {
@@ -78,7 +83,7 @@ object ParseUtil {
   def normalize(arr: Array[Double]) = {
     val (agreeMean, agreeSigma) = (4.589098867948532,2.269819260942984)
     val (answerMean, answerSigma) =   (2.366524658948996,1.3284576324183783)
-    val (boutiqueMean, boutiqueSigma) = (1.7271286096158458,0.972602339995984)
+    val (boutiqueMean, boutiqueSigma) = (1.7271286096158458,0.972602339995984)//精品回答数平均值以及标准差值
     Array(arr(0) - agreeMean/ agreeSigma, arr(1) - answerMean / answerSigma, arr(2) - boutiqueMean/ boutiqueSigma)
   }
 
